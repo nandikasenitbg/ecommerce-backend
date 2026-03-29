@@ -1,0 +1,474 @@
+{
+  "info": {
+    "name": "E-Commerce API",
+    "description": "Complete Postman collection for the E-Commerce Backend API",
+    "schema": "https://schema.getpostman.com/json/collection/v2.1.0/collection.json"
+  },
+  "variable": [
+    { "key": "BASE_URL", "value": "http://localhost:5000/api" },
+    { "key": "USER_TOKEN", "value": "" },
+    { "key": "ADMIN_TOKEN", "value": "" },
+    { "key": "PRODUCT_ID", "value": "" },
+    { "key": "ORDER_ID", "value": "" },
+    { "key": "CART_ITEM_ID", "value": "" }
+  ],
+  "item": [
+    {
+      "name": "Health",
+      "item": [
+        {
+          "name": "Health Check",
+          "request": {
+            "method": "GET",
+            "url": "{{BASE_URL}}/health"
+          }
+        }
+      ]
+    },
+    {
+      "name": "Auth & Users",
+      "item": [
+        {
+          "name": "Register User",
+          "request": {
+            "method": "POST",
+            "header": [{ "key": "Content-Type", "value": "application/json" }],
+            "url": "{{BASE_URL}}/users/register",
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"name\": \"Test User\",\n  \"email\": \"test@example.com\",\n  \"password\": \"password123\"\n}"
+            }
+          }
+        },
+        {
+          "name": "Login User",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "exec": [
+                  "const res = pm.response.json();",
+                  "if (res.success && res.data.token) {",
+                  "  pm.collectionVariables.set('USER_TOKEN', res.data.token);",
+                  "}"
+                ]
+              }
+            }
+          ],
+          "request": {
+            "method": "POST",
+            "header": [{ "key": "Content-Type", "value": "application/json" }],
+            "url": "{{BASE_URL}}/users/login",
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"email\": \"jane@example.com\",\n  \"password\": \"password123\"\n}"
+            }
+          }
+        },
+        {
+          "name": "Login Admin",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "exec": [
+                  "const res = pm.response.json();",
+                  "if (res.success && res.data.token) {",
+                  "  pm.collectionVariables.set('ADMIN_TOKEN', res.data.token);",
+                  "}"
+                ]
+              }
+            }
+          ],
+          "request": {
+            "method": "POST",
+            "header": [{ "key": "Content-Type", "value": "application/json" }],
+            "url": "{{BASE_URL}}/users/login",
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"email\": \"admin@ecommerce.com\",\n  \"password\": \"admin123\"\n}"
+            }
+          }
+        },
+        {
+          "name": "Get My Profile",
+          "request": {
+            "method": "GET",
+            "header": [{ "key": "Authorization", "value": "Bearer {{USER_TOKEN}}" }],
+            "url": "{{BASE_URL}}/users/profile"
+          }
+        },
+        {
+          "name": "Update My Profile",
+          "request": {
+            "method": "PUT",
+            "header": [
+              { "key": "Content-Type", "value": "application/json" },
+              { "key": "Authorization", "value": "Bearer {{USER_TOKEN}}" }
+            ],
+            "url": "{{BASE_URL}}/users/profile",
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"name\": \"Jane Updated\"\n}"
+            }
+          }
+        },
+        {
+          "name": "Get All Users (Admin)",
+          "request": {
+            "method": "GET",
+            "header": [{ "key": "Authorization", "value": "Bearer {{ADMIN_TOKEN}}" }],
+            "url": "{{BASE_URL}}/users"
+          }
+        }
+      ]
+    },
+    {
+      "name": "Products",
+      "item": [
+        {
+          "name": "Get All Products",
+          "request": {
+            "method": "GET",
+            "url": "{{BASE_URL}}/products"
+          }
+        },
+        {
+          "name": "Search Products",
+          "request": {
+            "method": "GET",
+            "url": {
+              "raw": "{{BASE_URL}}/products?keyword=apple&page=1&limit=10",
+              "query": [
+                { "key": "keyword", "value": "apple" },
+                { "key": "page", "value": "1" },
+                { "key": "limit", "value": "10" }
+              ]
+            }
+          }
+        },
+        {
+          "name": "Filter Products",
+          "request": {
+            "method": "GET",
+            "url": {
+              "raw": "{{BASE_URL}}/products?category=Electronics&minPrice=100&maxPrice=500&sort=price-asc",
+              "query": [
+                { "key": "category", "value": "Electronics" },
+                { "key": "minPrice", "value": "100" },
+                { "key": "maxPrice", "value": "500" },
+                { "key": "sort", "value": "price-asc" }
+              ]
+            }
+          }
+        },
+        {
+          "name": "Get Featured Products",
+          "request": {
+            "method": "GET",
+            "url": "{{BASE_URL}}/products/featured"
+          }
+        },
+        {
+          "name": "Get Top Rated Products",
+          "request": {
+            "method": "GET",
+            "url": "{{BASE_URL}}/products/top-rated"
+          }
+        },
+        {
+          "name": "Get Categories",
+          "request": {
+            "method": "GET",
+            "url": "{{BASE_URL}}/products/categories"
+          }
+        },
+        {
+          "name": "Get Product by ID",
+          "request": {
+            "method": "GET",
+            "url": "{{BASE_URL}}/products/{{PRODUCT_ID}}"
+          }
+        },
+        {
+          "name": "Create Product (Admin)",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "exec": [
+                  "const res = pm.response.json();",
+                  "if (res.success) pm.collectionVariables.set('PRODUCT_ID', res.data._id);"
+                ]
+              }
+            }
+          ],
+          "request": {
+            "method": "POST",
+            "header": [
+              { "key": "Content-Type", "value": "application/json" },
+              { "key": "Authorization", "value": "Bearer {{ADMIN_TOKEN}}" }
+            ],
+            "url": "{{BASE_URL}}/products",
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"name\": \"Test Product\",\n  \"description\": \"A great product for testing purposes\",\n  \"price\": 99.99,\n  \"images\": [{ \"url\": \"https://via.placeholder.com/400\", \"alt\": \"Test Product\" }],\n  \"category\": \"Electronics\",\n  \"brand\": \"TestBrand\",\n  \"countInStock\": 25,\n  \"isFeatured\": false,\n  \"discount\": 0\n}"
+            }
+          }
+        },
+        {
+          "name": "Update Product (Admin)",
+          "request": {
+            "method": "PUT",
+            "header": [
+              { "key": "Content-Type", "value": "application/json" },
+              { "key": "Authorization", "value": "Bearer {{ADMIN_TOKEN}}" }
+            ],
+            "url": "{{BASE_URL}}/products/{{PRODUCT_ID}}",
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"price\": 79.99,\n  \"countInStock\": 30,\n  \"isFeatured\": true\n}"
+            }
+          }
+        },
+        {
+          "name": "Add Review",
+          "request": {
+            "method": "POST",
+            "header": [
+              { "key": "Content-Type", "value": "application/json" },
+              { "key": "Authorization", "value": "Bearer {{USER_TOKEN}}" }
+            ],
+            "url": "{{BASE_URL}}/products/{{PRODUCT_ID}}/reviews",
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"rating\": 5,\n  \"comment\": \"Absolutely fantastic product! Exceeded my expectations.\"\n}"
+            }
+          }
+        },
+        {
+          "name": "Delete Product (Admin)",
+          "request": {
+            "method": "DELETE",
+            "header": [{ "key": "Authorization", "value": "Bearer {{ADMIN_TOKEN}}" }],
+            "url": "{{BASE_URL}}/products/{{PRODUCT_ID}}"
+          }
+        }
+      ]
+    },
+    {
+      "name": "Cart",
+      "item": [
+        {
+          "name": "Get Cart",
+          "request": {
+            "method": "GET",
+            "header": [{ "key": "Authorization", "value": "Bearer {{USER_TOKEN}}" }],
+            "url": "{{BASE_URL}}/cart"
+          }
+        },
+        {
+          "name": "Add to Cart",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "exec": [
+                  "const res = pm.response.json();",
+                  "if (res.success && res.data.items.length > 0) {",
+                  "  pm.collectionVariables.set('CART_ITEM_ID', res.data.items[0]._id);",
+                  "}"
+                ]
+              }
+            }
+          ],
+          "request": {
+            "method": "POST",
+            "header": [
+              { "key": "Content-Type", "value": "application/json" },
+              { "key": "Authorization", "value": "Bearer {{USER_TOKEN}}" }
+            ],
+            "url": "{{BASE_URL}}/cart",
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"productId\": \"{{PRODUCT_ID}}\",\n  \"quantity\": 2\n}"
+            }
+          }
+        },
+        {
+          "name": "Update Cart Item",
+          "request": {
+            "method": "PUT",
+            "header": [
+              { "key": "Content-Type", "value": "application/json" },
+              { "key": "Authorization", "value": "Bearer {{USER_TOKEN}}" }
+            ],
+            "url": "{{BASE_URL}}/cart/{{CART_ITEM_ID}}",
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"quantity\": 3\n}"
+            }
+          }
+        },
+        {
+          "name": "Remove Cart Item",
+          "request": {
+            "method": "DELETE",
+            "header": [{ "key": "Authorization", "value": "Bearer {{USER_TOKEN}}" }],
+            "url": "{{BASE_URL}}/cart/{{CART_ITEM_ID}}"
+          }
+        },
+        {
+          "name": "Clear Cart",
+          "request": {
+            "method": "DELETE",
+            "header": [{ "key": "Authorization", "value": "Bearer {{USER_TOKEN}}" }],
+            "url": "{{BASE_URL}}/cart"
+          }
+        }
+      ]
+    },
+    {
+      "name": "Orders",
+      "item": [
+        {
+          "name": "Create Order",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "exec": [
+                  "const res = pm.response.json();",
+                  "if (res.success) pm.collectionVariables.set('ORDER_ID', res.data._id);"
+                ]
+              }
+            }
+          ],
+          "request": {
+            "method": "POST",
+            "header": [
+              { "key": "Content-Type", "value": "application/json" },
+              { "key": "Authorization", "value": "Bearer {{USER_TOKEN}}" }
+            ],
+            "url": "{{BASE_URL}}/orders",
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"orderItems\": [\n    {\n      \"product\": \"{{PRODUCT_ID}}\",\n      \"name\": \"Sample Product\",\n      \"image\": \"https://via.placeholder.com/400\",\n      \"price\": 99.99,\n      \"quantity\": 1\n    }\n  ],\n  \"shippingAddress\": {\n    \"fullName\": \"Jane Doe\",\n    \"address\": \"123 Main Street\",\n    \"city\": \"New York\",\n    \"postalCode\": \"10001\",\n    \"country\": \"United States\"\n  },\n  \"paymentMethod\": \"stripe\"\n}"
+            }
+          }
+        },
+        {
+          "name": "Get My Orders",
+          "request": {
+            "method": "GET",
+            "header": [{ "key": "Authorization", "value": "Bearer {{USER_TOKEN}}" }],
+            "url": "{{BASE_URL}}/orders/my-orders"
+          }
+        },
+        {
+          "name": "Get Order by ID",
+          "request": {
+            "method": "GET",
+            "header": [{ "key": "Authorization", "value": "Bearer {{USER_TOKEN}}" }],
+            "url": "{{BASE_URL}}/orders/{{ORDER_ID}}"
+          }
+        },
+        {
+          "name": "Mark Order as Paid",
+          "request": {
+            "method": "PUT",
+            "header": [
+              { "key": "Content-Type", "value": "application/json" },
+              { "key": "Authorization", "value": "Bearer {{USER_TOKEN}}" }
+            ],
+            "url": "{{BASE_URL}}/orders/{{ORDER_ID}}/pay",
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"id\": \"pi_mock_12345\",\n  \"status\": \"succeeded\",\n  \"update_time\": \"2024-03-15T10:30:00Z\",\n  \"email_address\": \"jane@example.com\"\n}"
+            }
+          }
+        },
+        {
+          "name": "Get All Orders (Admin)",
+          "request": {
+            "method": "GET",
+            "header": [{ "key": "Authorization", "value": "Bearer {{ADMIN_TOKEN}}" }],
+            "url": "{{BASE_URL}}/orders"
+          }
+        },
+        {
+          "name": "Update Order Status (Admin)",
+          "request": {
+            "method": "PUT",
+            "header": [
+              { "key": "Content-Type", "value": "application/json" },
+              { "key": "Authorization", "value": "Bearer {{ADMIN_TOKEN}}" }
+            ],
+            "url": "{{BASE_URL}}/orders/{{ORDER_ID}}/status",
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"status\": \"shipped\",\n  \"trackingNumber\": \"1Z999AA10123456784\",\n  \"notes\": \"Shipped via FedEx Express\"\n}"
+            }
+          }
+        },
+        {
+          "name": "Mark as Delivered (Admin)",
+          "request": {
+            "method": "PUT",
+            "header": [
+              { "key": "Content-Type", "value": "application/json" },
+              { "key": "Authorization", "value": "Bearer {{ADMIN_TOKEN}}" }
+            ],
+            "url": "{{BASE_URL}}/orders/{{ORDER_ID}}/deliver",
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"trackingNumber\": \"1Z999AA10123456784\"\n}"
+            }
+          }
+        }
+      ]
+    },
+    {
+      "name": "Payment",
+      "item": [
+        {
+          "name": "Get Payment Config",
+          "request": {
+            "method": "GET",
+            "url": "{{BASE_URL}}/payment/config"
+          }
+        },
+        {
+          "name": "Create Payment Intent",
+          "request": {
+            "method": "POST",
+            "header": [
+              { "key": "Content-Type", "value": "application/json" },
+              { "key": "Authorization", "value": "Bearer {{USER_TOKEN}}" }
+            ],
+            "url": "{{BASE_URL}}/payment/create-payment-intent",
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"orderId\": \"{{ORDER_ID}}\"\n}"
+            }
+          }
+        },
+        {
+          "name": "Confirm Payment",
+          "request": {
+            "method": "POST",
+            "header": [
+              { "key": "Content-Type", "value": "application/json" },
+              { "key": "Authorization", "value": "Bearer {{USER_TOKEN}}" }
+            ],
+            "url": "{{BASE_URL}}/payment/confirm",
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"orderId\": \"{{ORDER_ID}}\",\n  \"paymentIntentId\": \"pi_mock_12345\",\n  \"paymentMethod\": \"stripe\"\n}"
+            }
+          }
+        }
+      ]
+    }
+  ]
+}
