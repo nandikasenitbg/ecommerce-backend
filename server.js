@@ -33,11 +33,13 @@ const app = express();
 // Allows requests from your React/Vite frontend
 const corsOptions = {
   origin: [
-    process.env.CLIENT_URL || 'http://localhost:5173', // Vite default
-    'http://localhost:3000', // CRA fallback
-    'http://localhost:4173', // Vite preview
-  ],
-  credentials: true, // Allow cookies/auth headers
+    process.env.CLIENT_URL,
+    'http://localhost:8080',
+    'http://localhost:5173',
+    'http://localhost:3000',
+    'http://localhost:4173',
+  ].filter(Boolean),
+  credentials: true,
   methods: ['GET', 'POST', 'PUT', 'DELETE', 'PATCH', 'OPTIONS'],
   allowedHeaders: ['Content-Type', 'Authorization'],
 };
@@ -59,7 +61,13 @@ if (process.env.NODE_ENV === 'development') {
 // ─── Static Files (for uploaded images) ──────────────────────────────────────
 app.use('/uploads', express.static(path.join(__dirname, 'uploads')));
 
-// ─── Health Check ─────────────────────────────────────────────────────────────
+// ─── Health Check & Root ──────────────────────────────────────────────────────
+app.get('/', (req, res) => {
+  res.send('E-Commerce API is running...');
+});
+
+app.get('/favicon.ico', (req, res) => res.status(204).end());
+
 app.get('/api/health', (req, res) => {
   res.status(200).json({
     success: true,
