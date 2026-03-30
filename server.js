@@ -32,14 +32,27 @@ const app = express();
 // ─── CORS Configuration ───────────────────────────────────────────────────────
 // Allows requests from your React/Vite frontend
 const corsOptions = {
-  origin: [
-    process.env.CLIENT_URL,
-    'https://aura-mart-pro.vercel.app',
-    'http://localhost:8080',
-    'http://localhost:5173',
-    'http://localhost:3000',
-    'http://localhost:4173',
-  ].filter(Boolean),
+  origin: function (origin, callback) {
+    const allowedOrigins = [
+      process.env.CLIENT_URL,
+      'http://localhost:8080',
+      'http://localhost:5173',
+      'http://localhost:3000',
+      'http://localhost:4173',
+    ].filter(Boolean);
+
+    // Allow requests with no origin (like mobile apps or curl)
+    if (!origin) return callback(null, true);
+
+    if (
+      allowedOrigins.indexOf(origin) !== -1 ||
+      origin.endsWith('.vercel.app')
+    ) {
+      callback(null, true);
+    } else {
+      callback(new Error('Not allowed by CORS'));
+    }
+  },
   credentials: true,
   methods: ['GET', 'POST', 'PUT', 'DELETE', 'PATCH', 'OPTIONS'],
   allowedHeaders: ['Content-Type', 'Authorization'],
