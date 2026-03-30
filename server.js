@@ -34,6 +34,7 @@ const app = express();
 const corsOptions = {
   origin: [
     process.env.CLIENT_URL,
+    'https://aura-mart-pro.vercel.app',
     'http://localhost:8080',
     'http://localhost:5173',
     'http://localhost:3000',
