@@ -87,12 +87,12 @@ app.use('/api/payment', paymentRoutes);
 
 // ─── Serve Frontend in Production ─────────────────────────────────────────────
 //if (process.env.NODE_ENV === 'production') {
-  //const frontendBuildPath = path.join(__dirname, '../frontend/dist');
-  //app.use(express.static(frontendBuildPath));
+//const frontendBuildPath = path.join(__dirname, '../frontend/dist');
+//app.use(express.static(frontendBuildPath));
 
-  // Catch-all: serve React app for any unmatched route
-  //app.get('*', (req, res) => {
-    //res.sendFile(path.resolve(frontendBuildPath, 'index.html'));
+// Catch-all: serve React app for any unmatched route
+//app.get('*', (req, res) => {
+//res.sendFile(path.resolve(frontendBuildPath, 'index.html'));
 //  });
 //}
 
